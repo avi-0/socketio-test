@@ -4,7 +4,7 @@ import { io } from "socket.io-client";
 import JoinRoom from "./JoinRoom";
 import { useEffect } from "react";
 
-const socket = io(':8080', {autoConnect: false});
+const socket = io({autoConnect: false});
 
 export default function Room() {
     const [searchParams, _] = useSearchParams();
