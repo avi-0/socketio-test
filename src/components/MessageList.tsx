@@ -1,6 +1,21 @@
 import { useEffect, useRef } from "react";
+import MessageLine from "./MessageLine";
 
-export default function MessageList({ messages }: { messages: string[]; }) {
+export type User = {
+  name: string;
+  id: string;
+}
+
+export type Message = {
+  text: string;
+  user?: User;
+}
+
+export interface MessageListProps {
+  messages: Message[];
+}
+
+export default function MessageList({ messages }: MessageListProps) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -8,11 +23,10 @@ export default function MessageList({ messages }: { messages: string[]; }) {
   }, [messages, ref])
 
   return (
-    <div ref={ref} className="border mb-3 overflow-auto" style={{ height: "50vh" }}>
+    <div ref={ref} className="border mb-3 overflow-auto bg-body" style={{ height: "50vh" }}>
       {messages.map(message =>
-        <div className="m-2 font-monospace">
-          {message}
-        </div>)}
+        <MessageLine message={message}></MessageLine>
+      )}
     </div>
   );
 }

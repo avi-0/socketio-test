@@ -7,11 +7,14 @@ interface InputLine {
 }
 
 export default function InputLine({ submit, label, submitLabel }: InputLine) {
-  const [value, setValue] = useState('');
+  const [value, setValue] = useState("");
 
   function submitAndClear(value: string) {
-    submit(value);
-    setValue('');
+    if (value != "") {
+      submit(value);
+    }
+    
+    setValue("");
   }
 
   return (
