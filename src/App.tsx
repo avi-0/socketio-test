@@ -3,7 +3,7 @@ import MessageList from "./components/MessageList";
 import InputLine from "./components/InputLine";
 import { io } from "socket.io-client";
 
-const socket = io("/ws");
+const socket = io();
 
 export default function App() {
   const [messages, setMessages] = useState<string[]>([]);
