@@ -25,4 +25,9 @@ io.on('connect', socket => {
 
         socket.join(roomId);
     })
+
+    // ping helper
+    socket.on("ping", (callback) => {
+        callback();
+    });
 })
