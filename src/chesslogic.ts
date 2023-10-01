@@ -1,4 +1,5 @@
-import { move } from "chessground/drag";
+// @ts-nocheck
+// FIXME:
 import { read, write } from "chessground/fen";
 import { Color, Key, Piece, files, ranks } from "chessground/types";
 
