@@ -14,7 +14,7 @@ export default function Room() {
     const [searchParams, _] = useSearchParams();
     const params = useParams();
 
-    const [state, setState] = useState(startingPosition);
+    const [state, _setState] = useState(startingPosition);
 
     if (searchParams.get("name") == null) {
         return <JoinRoom id={params.id || ""} />

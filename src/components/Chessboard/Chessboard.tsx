@@ -29,7 +29,7 @@ export default function Chessboard({
     const ref = useRef(null);
     const [api, setApi] = useState<Api | null>(null);
 
-    function onMoved(from: Square, to: Square, meta: MoveMetadata) {
+    function onMoved(from: Square, to: Square, _meta: MoveMetadata) {
         // update state to reflect change
 
         if (api) {
