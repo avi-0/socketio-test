@@ -1,6 +1,6 @@
 export default function NewRoomForm() {
   return (
-    <div className="d-flex h-100 justify-content-center align-items-center bg-body-tertiary">
+    <div className="d-flex vh-100 justify-content-center align-items-center bg-body-tertiary">
         <form action="/room/new">
             <div className="mb-3">
                 <label className="form-label" htmlFor="username">Your name</label>
