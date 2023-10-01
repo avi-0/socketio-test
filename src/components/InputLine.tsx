@@ -2,7 +2,7 @@ import { useState } from "react";
 
 interface InputLine {
   submit: (message: string) => void;
-  label: string;
+  label?: string;
   submitLabel: string;
 }
 
@@ -13,17 +13,19 @@ export default function InputLine({ submit, label, submitLabel }: InputLine) {
     if (value != "") {
       submit(value);
     }
-    
+
     setValue("");
   }
 
   return (
     <form className="row" autoComplete="off">
-      <div className="col-auto">
-        <label htmlFor="message" className="col-form-label">
-          {label}
-        </label>
-      </div>
+      {label &&
+        <div className="col-auto">
+          <label htmlFor="message" className="col-form-label">
+            {label}
+          </label>
+        </div>}
+      
       <div className="col">
         <input type="text" className="form-control" id="message"
           value={value}

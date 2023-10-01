@@ -43,6 +43,6 @@ export function Chat({ socket }: Props) {
 
     return <>
         <MessageList messages={messages} />
-        <InputLine submit={message => sendMessage(message)} label="Message" submitLabel="Send" />
+        <InputLine submit={message => sendMessage(message)} submitLabel="Send" />
     </>;
 }

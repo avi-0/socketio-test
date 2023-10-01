@@ -8,7 +8,7 @@ import { useOnSocketEvent } from "../hooks/useOnSocketEvent";
 import { getMoves, startingPosition } from "../chesslogic";
 import Chessboard from "./Chessboard/Chessboard";
 
-const socket = io({autoConnect: false});
+const socket = io({ autoConnect: false });
 
 export default function Room() {
     const [searchParams, _] = useSearchParams();
@@ -37,11 +37,18 @@ export default function Room() {
     const cheat = false;
     const moves = getMoves(state, cheat);
 
-    return <div className="container pt-5 d-flex flex-column gap-3">
-        <CopyLinkButton />
-        <Chat socket={socket}/>
-        <div style={{height: "800px"}}>
-            <Chessboard state={state} orientation="white" cheat={cheat} moves={moves} onMovePlayed={() => {}}/>
+    return <div className="container d-flex flex-row gap-3 vh-100 overflow-hidden py-4">
+        <div className="" style={{
+            aspectRatio: "1 / 1",
+        }}>
+            <Chessboard state={state} orientation="white" cheat={cheat} moves={moves} onMovePlayed={() => { }} />
+        </div>
+
+        <div className="d-flex flex-column gap-3 flex-grow-1" style={{
+            flexBasis: 0,
+        }}>
+            <CopyLinkButton />
+            <Chat socket={socket} />
         </div>
     </div>
 }
