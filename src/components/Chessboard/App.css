@@ -1,0 +1,55 @@
+.App {
+  width: 100%;
+  height: 100%;
+
+  padding: 32px;
+
+  display: grid;
+  grid-template-columns: 1fr max-content;
+  grid-template-rows: 1fr;
+  grid-column-gap: 32px;
+  justify-content: center;
+  align-content: center;
+
+  /* background-color: hsl(200, 100%, 90%); */
+}
+
+/* .App.ability-active {
+  background-color: #bbe1fa;
+} */
+
+.App-sidebar {
+  display: flex;
+  flex-flow: column nowrap;
+  gap: 8px;
+}
+
+.chessboard-row-wrapper {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: center;
+}
+
+.chessboard-column-wrapper {
+  aspect-ratio: 1 / 1;
+
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+}
+
+.chessboard {
+  flex: 0 1 auto;
+  aspect-ratio: 1 / 1;
+}
+
+cg-container {
+  box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14);
+}
+
+.flexspace {
+  flex-grow: 1;
+}

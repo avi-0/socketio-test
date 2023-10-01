@@ -18,7 +18,7 @@ export default function InputLine({ submit, label, submitLabel }: InputLine) {
   }
 
   return (
-    <form className="row mb-3" autoComplete="off">
+    <form className="row" autoComplete="off">
       <div className="col-auto">
         <label htmlFor="message" className="col-form-label">
           {label}

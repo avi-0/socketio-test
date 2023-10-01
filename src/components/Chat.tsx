@@ -3,52 +3,46 @@ import { Socket } from "socket.io-client";
 import MessageList, { Message, User } from "./MessageList";
 import InputLine from "./InputLine";
 import { useSearchParams } from "react-router-dom";
+import { useOnSocketEvent } from "../hooks/useOnSocketEvent";
 
 interface Props {
-  socket: Socket;
+    socket: Socket;
 }
 
 export function Chat({ socket }: Props) {
-  const [messages, setMessages] = useState<Message[]>([]);
+    const [messages, setMessages] = useState<Message[]>([]);
 
-  const [searchParams, _] = useSearchParams();
+    const [searchParams, _] = useSearchParams();
 
-  const user: User = {
-    name: searchParams.get("name") || "anonymous",
-    id: socket.id,
-  }
+    const user: User = {
+        name: searchParams.get("name") || "anonymous",
+        id: socket.id,
+    }
 
-  function addMessage(text: string, user?: User): void {
-    const message = {
-      text: text,
-      user: user,
-    };
-    setMessages((messages) => [...messages, message]);
-  }
+    function addMessage(text: string, user?: User): void {
+        const message = {
+            text: text,
+            user: user,
+        };
+        setMessages((messages) => [...messages, message]);
+    }
 
-  useEffect(() => {
-    socket.on('connect', () => {
-      addMessage(`connected with id ${socket.id}`);
+    useOnSocketEvent(socket, 'connect', () => {
+        addMessage(`connected with id ${socket.id}`);
     });
 
-    socket.on('message', (message, user?) => {
-      addMessage(message, user);
+    useOnSocketEvent(socket, 'message', (message, user?) => {
+        addMessage(message, user);
     });
 
-    return () => {
-      socket.off('connect');
-      socket.off('message');
-    };
-  }, []);
+    function sendMessage(message: string): void {
+        socket.emit('message', message, user.name);
 
-  function sendMessage(message: string): void {
-    socket.emit('message', message, user.name);
+        addMessage(message, user);
+    }
 
-    addMessage(message, user);
-  }
-
-  return <>
-    <MessageList messages={messages} />
-    <InputLine submit={message => sendMessage(message)} label="Message" submitLabel="Send" />
-  </>;
+    return <>
+        <MessageList messages={messages} />
+        <InputLine submit={message => sendMessage(message)} label="Message" submitLabel="Send" />
+    </>;
 }

@@ -23,7 +23,7 @@ export default function MessageList({ messages }: MessageListProps) {
   }, [messages, ref])
 
   return (
-    <div ref={ref} className="border mb-3 overflow-auto bg-body" style={{ height: "50vh" }}>
+    <div ref={ref} className="border overflow-auto bg-body" style={{ height: "50vh" }}>
       {messages.map(message =>
         <MessageLine message={message}></MessageLine>
       )}
