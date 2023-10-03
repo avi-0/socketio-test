@@ -1,4 +1,19 @@
-const io = require('socket.io')(8080, {
+import { Server } from "socket.io";
+
+type UserID = string;
+
+type User = {
+    id: UserID,
+    name: string,
+}
+
+type Room = {
+   users: Map<UserID, User>, 
+}
+
+const rooms = new Map<string, Room>();
+
+const io = new Server(8080, {
     cors: {
         origin: ["http://localhost:8080", "http://localhost:5173"],
     }
@@ -10,7 +25,7 @@ io.on('connect', socket => {
     socket.on('message', (message, username) => {
         console.log(`${socket.id}: ${message}`);
 
-        const user = {
+        const user: User = {
             name: username,
             id: socket.id,
         }
@@ -20,8 +35,8 @@ io.on('connect', socket => {
         })
     });
 
-    socket.on('join-room', (roomId) => {
-        console.log(`${socket.id} joined room ${roomId}`);
+    socket.on('join-room', (roomId: string, username: string) => {
+        console.log(`${username} ${socket.id} joined room ${roomId}`);
 
         socket.join(roomId);
     })

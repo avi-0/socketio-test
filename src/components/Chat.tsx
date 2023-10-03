@@ -11,7 +11,6 @@ interface Props {
 
 export function Chat({ socket }: Props) {
     const [messages, setMessages] = useState<Message[]>([]);
-
     const [searchParams, _] = useSearchParams();
 
     const user: User = {
