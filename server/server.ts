@@ -1,15 +1,5 @@
+import { Room, User } from "@app/common";
 import { Server } from "socket.io";
-
-type UserID = string;
-
-type User = {
-    id: UserID,
-    name: string,
-}
-
-type Room = {
-   users: Map<UserID, User>, 
-}
 
 const rooms = new Map<string, Room>();
 
