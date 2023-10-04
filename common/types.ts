@@ -9,6 +9,7 @@ export type User = {
 
 export type State = {
     fen: FEN,
+    lastMove?: [string, string],
 }
 
 export type Room = {

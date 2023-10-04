@@ -14,12 +14,14 @@ export type ChessboardProps = {
     cheat: boolean,
     dests: Map<Square, Square[]>,
     fen: FEN,
+    lastMove?: [Square, Square],
 
     onMoved: (from: Square, to: Square, meta: MoveMetadata) => void,
 }
 
 export default function Chessboard({
     fen,
+    lastMove,
     dests,
     orientation,
     cheat,
@@ -46,6 +48,7 @@ export default function Chessboard({
             const config: Config = {
                 // actual game position
                 fen: fen,
+                lastMove: lastMove,
 
                 // visual options and callbacks
                 orientation: orientation,

@@ -5,12 +5,12 @@ import JoinRoom from "./JoinRoom";
 import { useEffect, useState } from "react";
 import CopyLinkButton from "./CopyLinkButton";
 import { useOnSocketEvent } from "../hooks/useOnSocketEvent";
-import { Square, getChessjsDests, makeChessjsMove } from "../chesslogic";
+import { Square, flipColor, getChessjsDests, makeChessjsMove } from "../chesslogic";
 import Chessboard from "./Chessboard/Chessboard";
 // import Chip from "./Chip";
 import { State } from "@app/common";
 import { useSynchronizedState } from "../hooks/useSynchronizedState";
-import { MoveMetadata } from "chessground/types";
+import { Color, MoveMetadata } from "chessground/types";
 
 const socket = io({ autoConnect: false });
 
@@ -55,6 +55,7 @@ export default function Room() {
     function onMoved(from: Square, to: Square, meta: MoveMetadata) {
         updateState(draft => {
             draft.fen = makeChessjsMove(draft.fen, from, to);
+            draft.lastMove = [from, to];
         })
 
         if (meta.captured) {
@@ -67,7 +68,14 @@ export default function Room() {
     function reset() {
         updateState(draft => {
             draft.fen = startingPosition;
+            draft.lastMove = undefined;
         })
+    }
+
+    const [orientation, setOrientation] = useState<Color>("white");
+
+    function flip() {
+        setOrientation(orientation => flipColor(orientation));
     }
 
     const cheat = false;
@@ -77,7 +85,7 @@ export default function Room() {
         <div className="" style={{
             aspectRatio: "1 / 1",
         }}>
-            <Chessboard fen={state.fen} orientation="white" cheat={cheat} dests={dests} onMoved={onMoved} />
+            <Chessboard fen={state.fen} lastMove={state.lastMove as [Square, Square]} orientation={orientation} cheat={cheat} dests={dests} onMoved={onMoved} />
         </div>
 
         <div className="d-flex flex-column gap-3 flex-grow-1" style={{
@@ -87,6 +95,9 @@ export default function Room() {
                 <CopyLinkButton />
                 <button className="btn btn-primary" onClick={() => reset()}>
                     Reset
+                </button>
+                <button className="btn btn-primary" onClick={() => flip()}>
+                    Flip
                 </button>
             </div>
             {/* <div className="d-flex flex-row flex-wrap justify-content-center gap-2">
