@@ -34,6 +34,10 @@ io.on('connect', socket => {
 
     socket.on('state-patches', patches => {
         console.log(patches);
+
+        socket.rooms.forEach((room) => {
+            socket.to(room).emit('state-patches', patches);
+        })
     }) 
 
     // ping helper

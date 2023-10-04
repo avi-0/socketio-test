@@ -5,7 +5,7 @@ import JoinRoom from "./JoinRoom";
 import { useEffect, useState } from "react";
 import CopyLinkButton from "./CopyLinkButton";
 import { useOnSocketEvent } from "../hooks/useOnSocketEvent";
-import { Square, getChessjsDests, makeChessjsMove, startingPosition } from "../chesslogic";
+import { Square, getChessjsDests, makeChessjsMove } from "../chesslogic";
 import Chessboard from "./Chessboard/Chessboard";
 // import Chip from "./Chip";
 import { State } from "@app/common";
@@ -14,9 +14,9 @@ import { MoveMetadata } from "chessground/types";
 
 const socket = io({ autoConnect: false });
 
+const startingPosition = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 const initialState: State = {
-    chess: startingPosition,
-    fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+    fen: startingPosition,
 }
 
 export default function Room() {
@@ -66,7 +66,7 @@ export default function Room() {
 
     function reset() {
         updateState(draft => {
-            draft.chess = startingPosition;
+            draft.fen = startingPosition;
         })
     }
 

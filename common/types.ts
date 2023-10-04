@@ -8,7 +8,6 @@ export type User = {
 }
 
 export type State = {
-    chess: any, // FIXME: lazy
     fen: FEN,
 }
 
