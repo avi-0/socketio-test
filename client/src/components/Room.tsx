@@ -91,7 +91,7 @@ export default function Room() {
         <div className="d-flex flex-column gap-3 flex-grow-1" style={{
             flexBasis: 0,
         }}>
-            <div className="d-flex flex-row gap-3">
+            <div className="d-flex flex-row gap-3 flex-wrap">
                 <CopyLinkButton />
                 <button className="btn btn-primary" onClick={() => reset()}>
                     Reset
