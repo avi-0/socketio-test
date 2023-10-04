@@ -1,13 +1,14 @@
-import { Room, User } from "@app/common";
+import { Room, RoomID, User } from "@app/common";
 import { Server } from "socket.io";
-
-const rooms = new Map<string, Room>();
 
 const io = new Server(8080, {
     cors: {
         origin: ["http://localhost:8080", "http://localhost:5173"],
     }
 });
+
+
+const rooms = new Map<RoomID, Room>();
 
 io.on('connect', socket => {
     console.log(socket.id);

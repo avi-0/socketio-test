@@ -7,9 +7,15 @@ import CopyLinkButton from "./CopyLinkButton";
 import { useOnSocketEvent } from "../hooks/useOnSocketEvent";
 import { Move, getMoves, startingPosition } from "../chesslogic";
 import Chessboard from "./Chessboard/Chessboard";
-import Chip from "./Chip";
+// import Chip from "./Chip";
+import { State } from "@app/common";
+import { produce } from "immer";
 
 const socket = io({ autoConnect: false });
+
+const initialState: State = {
+    chess: startingPosition,
+}
 
 export default function Room() {
     const [searchParams, _] = useSearchParams();
@@ -35,7 +41,7 @@ export default function Room() {
         socket.emit("join-room", roomId, username);
     });
 
-    const [state, setState] = useState(startingPosition);
+    const [state, setState] = useState(initialState);
 
     const [moveSound, _setMoveSound] = useState(new Audio("/sounds/move.mp3"));
     const [captureSound, _setCaptureSound] = useState(new Audio("/sounds/capture.mp3"));
@@ -45,7 +51,9 @@ export default function Room() {
     }, [moveSound, captureSound]);
 
     function onMovePlayed(move: Move) {
-        setState(move.result);
+        setState(produce(draft => {
+            draft.chess = move.result;
+        }));
 
         if (move.result.justCaptured) {
             captureSound.play();
@@ -55,27 +63,27 @@ export default function Room() {
     }
 
     const cheat = false;
-    const moves = getMoves(state, cheat);
+    const moves = getMoves(state.chess, cheat);
 
     return <div className="container-xl d-flex flex-row gap-3 vh-100 overflow-hidden py-4">
         <div className="" style={{
             aspectRatio: "1 / 1",
         }}>
-            <Chessboard state={state} orientation="white" cheat={cheat} moves={moves} onMovePlayed={onMovePlayed} />
+            <Chessboard state={state.chess} orientation="white" cheat={cheat} moves={moves} onMovePlayed={onMovePlayed} />
         </div>
 
         <div className="d-flex flex-column gap-3 flex-grow-1" style={{
             flexBasis: 0,
         }}>
             <CopyLinkButton />
-            <div className="d-flex flex-row flex-wrap justify-content-center gap-2">
+            {/* <div className="d-flex flex-row flex-wrap justify-content-center gap-2">
                 <Chip>avi</Chip>
                 <Chip>sqlc</Chip>
                 <Chip>DarnedLight</Chip>
                 <Chip>avondale</Chip>
                 <Chip>sqlc</Chip>
                 <Chip>sqlc</Chip>
-            </div>
+            </div> */}
             <Chat socket={socket} />
         </div>
     </div>
