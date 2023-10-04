@@ -8,7 +8,7 @@ import { useOnSocketEvent } from "../hooks/useOnSocketEvent";
 import { Square, flipColor, getChessjsDests, makeChessjsMove } from "../chesslogic";
 import Chessboard from "./Chessboard/Chessboard";
 // import Chip from "./Chip";
-import { State, initialState, startingPosition } from "@app/common";
+import { State, initialState } from "@app/common";
 import { useSynchronizedState } from "../hooks/useSynchronizedState";
 import { Color, MoveMetadata } from "chessground/types";
 
