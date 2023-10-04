@@ -12,6 +12,7 @@
   "dependencies": {
     "@app/common": "^1.0.0",
     "@types/color-convert": "^2.0.1",
+    "chess.js": "^1.0.0-beta.6",
     "chessground": "^9.0.4",
     "color-convert": "^2.0.1",
     "immer": "^10.0.3",

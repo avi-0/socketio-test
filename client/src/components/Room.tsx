@@ -5,16 +5,17 @@ import JoinRoom from "./JoinRoom";
 import { useEffect, useState } from "react";
 import CopyLinkButton from "./CopyLinkButton";
 import { useOnSocketEvent } from "../hooks/useOnSocketEvent";
-import { Move, getMoves, startingPosition } from "../chesslogic";
+import { Square, getChessjsDests, makeChessjsMove, startingPosition } from "../chesslogic";
 import Chessboard from "./Chessboard/Chessboard";
 // import Chip from "./Chip";
 import { State } from "@app/common";
-import { produce } from "immer";
+import { useSynchronizedState } from "../hooks/useSynchronizedState";
 
 const socket = io({ autoConnect: false });
 
 const initialState: State = {
     chess: startingPosition,
+    fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
 }
 
 export default function Room() {
@@ -41,7 +42,7 @@ export default function Room() {
         socket.emit("join-room", roomId, username);
     });
 
-    const [state, setState] = useState(initialState);
+    const [state, updateState] = useSynchronizedState(initialState, socket, "state-patches", "state-patches");
 
     const [moveSound, _setMoveSound] = useState(new Audio("/sounds/move.mp3"));
     const [captureSound, _setCaptureSound] = useState(new Audio("/sounds/capture.mp3"));
@@ -50,32 +51,37 @@ export default function Room() {
         captureSound.volume = 0.4;
     }, [moveSound, captureSound]);
 
-    function onMovePlayed(move: Move) {
-        setState(produce(draft => {
-            draft.chess = move.result;
-        }));
+    function onMoved(from: Square, to: Square) {
+        updateState(draft => {
+            draft.fen = makeChessjsMove(draft.fen, from, to);
+        })
+    }
 
-        if (move.result.justCaptured) {
-            captureSound.play();
-        } else {
-            moveSound.play();
-        }
+    function reset() {
+        updateState(draft => {
+            draft.chess = startingPosition;
+        })
     }
 
     const cheat = false;
-    const moves = getMoves(state.chess, cheat);
+    const dests = getChessjsDests(state.fen);
 
     return <div className="container-xl d-flex flex-row gap-3 vh-100 overflow-hidden py-4">
         <div className="" style={{
             aspectRatio: "1 / 1",
         }}>
-            <Chessboard state={state.chess} orientation="white" cheat={cheat} moves={moves} onMovePlayed={onMovePlayed} />
+            <Chessboard fen={state.fen} orientation="white" cheat={cheat} dests={dests} onMoved={onMoved} />
         </div>
 
         <div className="d-flex flex-column gap-3 flex-grow-1" style={{
             flexBasis: 0,
         }}>
-            <CopyLinkButton />
+            <div className="d-flex flex-row gap-3">
+                <CopyLinkButton />
+                <button className="btn btn-primary" onClick={() => reset()}>
+                    Reset
+                </button>
+            </div>
             {/* <div className="d-flex flex-row flex-wrap justify-content-center gap-2">
                 <Chip>avi</Chip>
                 <Chip>sqlc</Chip>

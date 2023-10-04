@@ -1,5 +1,6 @@
 // @ts-nocheck
 // FIXME:
+import { Chess } from "chess.js";
 import { read, write } from "chessground/fen";
 import { Color, Key, Piece, files, ranks } from "chessground/types";
 
@@ -254,4 +255,28 @@ export function getMoves(state: ChessState, cheat?: boolean): Moves {
             .map(from => {
                 return [from, squareMoves(state, from, cheat)]
             }))
+}
+
+
+
+// simpler chess.js based version
+
+export function getChessjsDests(fen: FEN): Map<Square, Square[]> {
+    const chess = new Chess(fen);
+
+    const dests = new Map();
+    SQUARES.forEach(s => {
+        const ms = chess.moves({ square: s, verbose: true });
+        if (ms.length) dests.set(s, ms.map(m => m.to));
+    });
+
+    return dests;
+}
+
+export function makeChessjsMove(fen: FEN, from: Square, to: Square): FEN {
+    const chess = new Chess(fen);
+
+    chess.move({from, to});
+
+    return chess.fen();
 }

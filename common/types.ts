@@ -1,5 +1,6 @@
 export type UserID = string;
 export type RoomID = string;
+export type FEN = string;
 
 export type User = {
     id: UserID,
@@ -8,6 +9,7 @@ export type User = {
 
 export type State = {
     chess: any, // FIXME: lazy
+    fen: FEN,
 }
 
 export type Room = {

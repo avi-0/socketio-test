@@ -5,46 +5,47 @@ import "./chessground.base.css";
 import "./chessground.brown.css";
 import "./Chessboard.css";
 import './App.css';
-import { ChessState, Move, fenFromPieces } from '../../chesslogic';
-import { Color, Key as Square, MoveMetadata } from 'chessground/types';
+import { Color, Key as Square, MoveMetadata, FEN } from 'chessground/types';
 import { Api } from 'chessground/api';
 import { Config } from 'chessground/config';
 
 export type ChessboardProps = {
-    state: ChessState,
     orientation: Color,
     cheat: boolean,
-    moves: Map<Square, Move[]>,
+    dests: Map<Square, Square[]>,
+    fen: FEN,
 
-    onMovePlayed: (move: Move) => void,
+    onMoved: (from: Square, to: Square) => void,
 }
 
 export default function Chessboard({
-    state,
+    fen,
+    dests,
     orientation,
     cheat,
-    moves,
-    onMovePlayed,
+    onMoved,
 }: ChessboardProps) {
     const ref = useRef(null);
     const [api, setApi] = useState<Api | null>(null);
 
-    function onMoved(from: Square, to: Square, _meta: MoveMetadata) {
-        // update state to reflect change
+    function move(from: Square, to: Square, _meta: MoveMetadata) {
+        // // update state to reflect change
 
-        if (api) {
-            // find which move this was
-            const movePlayed = moves.get(from)?.find(move => move.to == to)
+        // if (api) {
+        //     // find which move this was
+        //     const movePlayed = moves.get(from)?.find(move => move.to == to)
 
-            // pass state up
-            if (onMovePlayed && movePlayed) {
-                onMovePlayed(movePlayed);
-            }
+        //     // pass state up
+        //     if (onMovePlayed && movePlayed) {
+        //         onMovePlayed(movePlayed);
+        //     }
 
-            // undo some of the internal state change until actual new state arrives from prop
-            // to fix animations
-            api.state.pieces = state.pieces;
-        }
+        //     // undo some of the internal state change until actual new state arrives from prop
+        //     // to fix animations
+        //     api.state.pieces = state.pieces;
+        // }
+
+        onMoved(from, to);
     }
 
     // first time setup
@@ -58,18 +59,9 @@ export default function Chessboard({
     // update inner state
     useEffect(() => {
         if (api) {
-            // yo dawg we put .map in your .map so you can map inside Map
-            const chessgroundMoves = new Map(
-                Array.from(moves.entries()).map(([from, moves]) => 
-                    [from, moves.map(move => move.to)]
-                )
-            );
-
             const config: Config = {
                 // actual game position
-                fen: fenFromPieces(state.pieces),
-                turnColor: state.turnColor,
-                lastMove: state.lastMove,
+                fen: fen,
 
                 // visual options and callbacks
                 orientation: orientation,
@@ -81,16 +73,16 @@ export default function Chessboard({
                 movable: {
                     free: cheat,
                     showDests: true,
-                    dests: chessgroundMoves,
+                    dests: dests,
                     events: {
-                        after: onMoved,
+                        after: move,
                     },
                 }
             }
 
             api.set(config);
         }
-    }, [api, state, orientation, onMoved, cheat]);
+    }, [api, orientation, move, cheat]);
 
     return (
         <div className="chessboard-row-wrapper">

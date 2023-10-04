@@ -7,7 +7,7 @@ export default function CopyLinkButton() {
     }
 
     return (
-        <button className="btn btn-primary btn-sm" onClick={() => copyLink()}>
+        <button className="btn btn-primary" onClick={() => copyLink()}>
             <i className="bi bi-clipboard"></i> Copy link
         </button>
     )
