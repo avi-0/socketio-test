@@ -12,7 +12,7 @@ export type State = {
     lastMove?: [string, string],
 }
 
-export type Room = {
-   users: Map<UserID, User>,
-   state: State,
+export const startingPosition = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+export const initialState: State = {
+    fen: startingPosition,
 }

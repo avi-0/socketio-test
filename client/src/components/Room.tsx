@@ -8,16 +8,11 @@ import { useOnSocketEvent } from "../hooks/useOnSocketEvent";
 import { Square, flipColor, getChessjsDests, makeChessjsMove } from "../chesslogic";
 import Chessboard from "./Chessboard/Chessboard";
 // import Chip from "./Chip";
-import { State } from "@app/common";
+import { State, initialState, startingPosition } from "@app/common";
 import { useSynchronizedState } from "../hooks/useSynchronizedState";
 import { Color, MoveMetadata } from "chessground/types";
 
 const socket = io({ autoConnect: false });
-
-const startingPosition = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
-const initialState: State = {
-    fen: startingPosition,
-}
 
 export default function Room() {
     const [searchParams, _] = useSearchParams();
@@ -43,7 +38,7 @@ export default function Room() {
         socket.emit("join-room", roomId, username);
     });
 
-    const [state, updateState] = useSynchronizedState(initialState, socket, "state-patches", "state-patches");
+    const [state, updateState] = useSynchronizedState<State>(initialState, socket, "state-patches", "state-patches");
 
     const [moveSound, _setMoveSound] = useState(new Audio("/sounds/move.mp3"));
     const [captureSound, _setCaptureSound] = useState(new Audio("/sounds/capture.mp3"));
@@ -66,10 +61,7 @@ export default function Room() {
     }
 
     function reset() {
-        updateState(draft => {
-            draft.fen = startingPosition;
-            draft.lastMove = undefined;
-        })
+        updateState(_ => initialState);
     }
 
     const [orientation, setOrientation] = useState<Color>("white");
