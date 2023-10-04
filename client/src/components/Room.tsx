@@ -10,6 +10,7 @@ import Chessboard from "./Chessboard/Chessboard";
 // import Chip from "./Chip";
 import { State } from "@app/common";
 import { useSynchronizedState } from "../hooks/useSynchronizedState";
+import { MoveMetadata } from "chessground/types";
 
 const socket = io({ autoConnect: false });
 
@@ -51,10 +52,16 @@ export default function Room() {
         captureSound.volume = 0.4;
     }, [moveSound, captureSound]);
 
-    function onMoved(from: Square, to: Square) {
+    function onMoved(from: Square, to: Square, meta: MoveMetadata) {
         updateState(draft => {
             draft.fen = makeChessjsMove(draft.fen, from, to);
         })
+
+        if (meta.captured) {
+            captureSound.play();
+        } else {
+            moveSound.play();
+        }
     }
 
     function reset() {

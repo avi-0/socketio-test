@@ -15,7 +15,7 @@ export type ChessboardProps = {
     dests: Map<Square, Square[]>,
     fen: FEN,
 
-    onMoved: (from: Square, to: Square) => void,
+    onMoved: (from: Square, to: Square, meta: MoveMetadata) => void,
 }
 
 export default function Chessboard({
@@ -28,24 +28,8 @@ export default function Chessboard({
     const ref = useRef(null);
     const [api, setApi] = useState<Api | null>(null);
 
-    function move(from: Square, to: Square, _meta: MoveMetadata) {
-        // // update state to reflect change
-
-        // if (api) {
-        //     // find which move this was
-        //     const movePlayed = moves.get(from)?.find(move => move.to == to)
-
-        //     // pass state up
-        //     if (onMovePlayed && movePlayed) {
-        //         onMovePlayed(movePlayed);
-        //     }
-
-        //     // undo some of the internal state change until actual new state arrives from prop
-        //     // to fix animations
-        //     api.state.pieces = state.pieces;
-        // }
-
-        onMoved(from, to);
+    function move(from: Square, to: Square, meta: MoveMetadata) {
+        onMoved(from, to, meta);
     }
 
     // first time setup
