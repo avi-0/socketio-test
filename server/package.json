@@ -2,9 +2,11 @@
   "name": "@app/server",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "dev": "nodemon server.ts",
-    "start": "npx ts-node server.ts"
+    "build": "tsc",
+    "start": "node dist/server.js"
   },
   "author": "",
   "license": "ISC",
