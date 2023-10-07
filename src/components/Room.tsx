@@ -11,6 +11,7 @@ import Chessboard from "./Chessboard/Chessboard";
 import { State, initialState } from "../common/types";
 import { useSynchronizedState } from "../hooks/useSynchronizedState";
 import { Color, MoveMetadata } from "chessground/types";
+import { DrawShape } from "chessground/draw";
 
 const socket = io({ autoConnect: false });
 
@@ -60,6 +61,12 @@ export default function Room() {
         }
     }
 
+    function onShapesChanged(shapes: DrawShape[]) {
+        updateState(draft => {
+            draft.shapes = structuredClone(shapes);
+        })
+    }
+
     function reset() {
         updateState(_ => initialState);
     }
@@ -77,7 +84,15 @@ export default function Room() {
         <div className="" style={{
             aspectRatio: "1 / 1",
         }}>
-            <Chessboard fen={state.fen} lastMove={state.lastMove as [Square, Square]} orientation={orientation} cheat={cheat} dests={dests} onMoved={onMoved} />
+            <Chessboard
+                fen={state.fen}
+                lastMove={state.lastMove as [Square, Square]}
+                orientation={orientation}
+                cheat={cheat}
+                dests={dests}
+                shapes={structuredClone(state.shapes)}
+                onMoved={onMoved}
+                onShapesChanged={onShapesChanged} />
         </div>
 
         <div className="d-flex flex-column gap-3 flex-grow-1" style={{

@@ -8,6 +8,7 @@ import './App.css';
 import { Color, Key as Square, MoveMetadata, FEN } from 'chessground/types';
 import { Api } from 'chessground/api';
 import { Config } from 'chessground/config';
+import { DrawShape } from 'chessground/draw';
 
 export type ChessboardProps = {
     orientation: Color,
@@ -15,8 +16,10 @@ export type ChessboardProps = {
     dests: Map<Square, Square[]>,
     fen: FEN,
     lastMove?: [Square, Square],
+    shapes?: DrawShape[],
 
-    onMoved: (from: Square, to: Square, meta: MoveMetadata) => void,
+    onMoved?: (from: Square, to: Square, meta: MoveMetadata) => void,
+    onShapesChanged?: (shapes: DrawShape[]) => void,
 }
 
 export default function Chessboard({
@@ -25,13 +28,15 @@ export default function Chessboard({
     dests,
     orientation,
     cheat,
+    shapes,
     onMoved,
+    onShapesChanged,
 }: ChessboardProps) {
     const ref = useRef(null);
     const [api, setApi] = useState<Api | null>(null);
 
     function move(from: Square, to: Square, meta: MoveMetadata) {
-        onMoved(from, to, meta);
+        onMoved?.(from, to, meta);
     }
 
     // first time setup
@@ -64,6 +69,11 @@ export default function Chessboard({
                     events: {
                         after: move,
                     },
+                },
+                drawable: {
+                    onChange: (shapes) => onShapesChanged?.(shapes),
+                    shapes: shapes,
+                    // eraseOnClick: false,
                 }
             }
 
