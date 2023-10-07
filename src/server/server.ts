@@ -1,4 +1,4 @@
-import { RoomID, State, User, UserID, initialState } from "@app/common";
+import { RoomID, State, User, UserID, initialState } from "../common/types";
 import { Patch, applyPatches, enablePatches, produceWithPatches } from "immer";
 import { Server } from "socket.io";
 
@@ -9,6 +9,8 @@ const io = new Server(8080, {
         origin: ["http://localhost:8080", "http://localhost:5173"],
     }
 });
+
+console.log("server started");
 
 type Room = {
     patches: Patch[],
