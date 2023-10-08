@@ -52,6 +52,9 @@ export default function Room() {
         updateState(draft => {
             draft.fen = makeChessjsMove(draft.fen, from, to);
             draft.lastMove = [from, to];
+
+            // clear shapes
+            draft.shapes = [];
         })
 
         if (meta.captured) {
