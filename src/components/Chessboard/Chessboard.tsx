@@ -47,6 +47,17 @@ export default function Chessboard({
         }
     }, [ref]);
 
+    function onInnerShapesChanged(newShapes: DrawShape[]) {
+        // prevent left clicks from clearing shapes
+
+        if (api?.state.drawable.current) {
+            onShapesChanged?.(newShapes);
+        } else {
+            // force previous shapes
+            api!.state.drawable.shapes = shapes || [];
+        }
+    }
+
     // update inner state
     useEffect(() => {
         if (api) {
@@ -71,9 +82,9 @@ export default function Chessboard({
                     },
                 },
                 drawable: {
-                    onChange: (shapes) => onShapesChanged?.(shapes),
+                    onChange: (shapes) => onInnerShapesChanged(shapes),
                     shapes: shapes,
-                    // eraseOnClick: false,
+                    eraseOnClick: false,
                 }
             }
 
