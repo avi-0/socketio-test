@@ -1,11 +1,11 @@
 import { useParams, useSearchParams } from "react-router-dom";
-import { Chat } from "./Chat";
+import { Chat } from "../components/Chat";
 import JoinRoom from "./JoinRoom";
 import { useState } from "react";
-import CopyLinkButton from "./CopyLinkButton";
+import CopyLinkButton from "../components/CopyLinkButton";
 import { useOnSocketEvent } from "../hooks/useOnSocketEvent";
 import { Square, flipColor, getChessjsDests, makeChessjsMove } from "../chesslogic";
-import Chessboard from "./Chessboard/Chessboard";
+import Chessboard from "../components/Chessboard/Chessboard";
 // import Chip from "./Chip";
 import { State, initialState } from "../common/types";
 import { useSynchronizedState } from "../hooks/useSynchronizedState";

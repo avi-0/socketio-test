@@ -1,7 +1,7 @@
 import { Route, Routes } from "react-router-dom";
-import NewRoom from "./components/NewRoom";
-import NewRoomForm from "./components/NewRoomForm";
-import Room from "./components/Room";
+import NewRoom from "./pages/NewRoom";
+import NewRoomForm from "./pages/NewRoomForm";
+import Room from "./pages/Room";
 
 export default function App() {
   return <Routes>
