@@ -1,4 +1,4 @@
-import { colorFromId } from "../color";
+import { colorFromId } from "../common/color";
 import { Message } from "./MessageList";
 
 interface MessageProps {

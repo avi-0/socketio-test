@@ -4,7 +4,7 @@ import JoinRoom from "./JoinRoom";
 import { useState } from "react";
 import CopyLinkButton from "../components/CopyLinkButton";
 import { useOnSocketEvent } from "../hooks/useOnSocketEvent";
-import { Square, flipColor, getChessjsDests, makeChessjsMove } from "../chesslogic";
+import { Square, flipColor, getChessjsDests, makeChessjsMove } from "../common/chesslogic";
 import Chessboard from "../components/Chessboard/Chessboard";
 // import Chip from "./Chip";
 import { State, initialState } from "../common/types";
