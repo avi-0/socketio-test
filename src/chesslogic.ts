@@ -266,9 +266,13 @@ export function getChessjsDests(fen: FEN): Map<Square, Square[]> {
 
     const dests = new Map();
     SQUARES.forEach(s => {
-        const ms = chess.moves({ square: s, verbose: true });
-        if (ms.length) dests.set(s, ms.map(m => m.to));
-    });
+        dests.set(s, []);
+    })
+
+    const moves = chess.moves({ verbose: true});
+    moves.forEach(move => {
+        dests.get(move.from).push(move.to);
+    })
 
     return dests;
 }
