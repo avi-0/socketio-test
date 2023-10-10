@@ -17,7 +17,6 @@ export function useSynchronizedState<S extends Objectish>(initialState: S, socke
             const [nextState, patches, _inversePatches] = produceWithPatches(state, recipe);
 
             socket.emit(patchesToServerEventName, patches);
-            console.log(patches);
 
             return nextState;
         });

@@ -1,8 +1,7 @@
 import { useParams, useSearchParams } from "react-router-dom";
 import { Chat } from "./Chat";
-import { io } from "socket.io-client";
 import JoinRoom from "./JoinRoom";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import CopyLinkButton from "./CopyLinkButton";
 import { useOnSocketEvent } from "../hooks/useOnSocketEvent";
 import { Square, flipColor, getChessjsDests, makeChessjsMove } from "../chesslogic";
@@ -12,8 +11,8 @@ import { State, initialState } from "../common/types";
 import { useSynchronizedState } from "../hooks/useSynchronizedState";
 import { Color, MoveMetadata } from "chessground/types";
 import { DrawShape } from "chessground/draw";
-
-const socket = io({ autoConnect: false });
+import { useAudio } from "../hooks/useAudio";
+import { useSocket } from "../hooks/useSocket";
 
 export default function Room() {
     const [searchParams, _] = useSearchParams();
@@ -27,13 +26,7 @@ export default function Room() {
 
     const roomId = params.id;
 
-    useEffect(() => {
-        socket.connect();
-
-        return () => {
-            socket.disconnect();
-        }
-    }, []);
+    const socket = useSocket();
 
     useOnSocketEvent(socket, "connect", () => {
         socket.emit("join-room", roomId, username);
@@ -41,12 +34,8 @@ export default function Room() {
 
     const [state, updateState] = useSynchronizedState<State>(initialState, socket, "state-patches", "state-patches");
 
-    const [moveSound, _setMoveSound] = useState(new Audio("/sounds/move.mp3"));
-    const [captureSound, _setCaptureSound] = useState(new Audio("/sounds/capture.mp3"));
-    useEffect(() => {
-        moveSound.volume = 0.4;
-        captureSound.volume = 0.4;
-    }, [moveSound, captureSound]);
+    const moveSound = useAudio("/sounds/move.mp3", { volume: 0.4 });
+    const captureSound  = useAudio("/sounds/capture.mp3", { volume: 0.4 });
 
     function onMoved(from: Square, to: Square, meta: MoveMetadata) {
         updateState(draft => {
@@ -110,14 +99,6 @@ export default function Room() {
                     Flip
                 </button>
             </div>
-            {/* <div className="d-flex flex-row flex-wrap justify-content-center gap-2">
-                <Chip>avi</Chip>
-                <Chip>sqlc</Chip>
-                <Chip>DarnedLight</Chip>
-                <Chip>avondale</Chip>
-                <Chip>sqlc</Chip>
-                <Chip>sqlc</Chip>
-            </div> */}
             <Chat socket={socket} />
         </div>
     </div>
