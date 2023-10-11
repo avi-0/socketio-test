@@ -1,16 +1,8 @@
 import { RoomID, State, User, UserID, initialState } from "../common/types";
 import { Patch, applyPatches, enablePatches, produceWithPatches } from "immer";
-import { Server } from "socket.io";
+import { Socket, Server as SocketIOServer } from "socket.io";
 
 enablePatches();
-
-const io = new Server(8080, {
-    cors: {
-        origin: ["http://localhost:8080", "http://localhost:5173"],
-    }
-});
-
-console.log("server started");
 
 type Room = {
     patches: Patch[],
@@ -30,11 +22,29 @@ type Room = {
     return newPatches;
  }
 
-const userRooms = new Map<UserID, RoomID>();
-const rooms = new Map<RoomID, Room>();
+class Server {
+    io: SocketIOServer;
+    userRooms = new Map<UserID, RoomID>();
+    rooms = new Map<RoomID, Room>();
 
-io.on('connect', socket => {
-    socket.on('message', (message, username) => {
+    constructor() {
+        this.io = new SocketIOServer(8080, {
+            cors: {
+                origin: ["http://localhost:8080", "http://localhost:5173"],
+            }
+        });
+
+        this.io.on('connect', socket => {
+            socket.on('message', this.onMessage(socket));
+            socket.on('join-room', this.onJoinRoom(socket));
+            socket.on('state-patches', this.onStatePatches(socket));
+            socket.on("ping", this.onPing(socket));
+        })
+
+        console.log("server started");
+    }
+
+    onMessage = (socket: Socket) => (message: string, username: string) => {
         console.log(`${username}: ${message}`);
 
         const user: User = {
@@ -45,36 +55,34 @@ io.on('connect', socket => {
         socket.rooms.forEach((room) => {
             socket.to(room).emit('message', message, user);
         })
-    });
+    }
 
-    socket.on('join-room', (roomID: string, username: string) => {
+    onJoinRoom = (socket: Socket) => (roomID: string, username: string) => {
         console.log(`${username} joined room ${roomID}`);
 
-        const currentRoomID = userRooms.get(socket.id);
+        const currentRoomID = this.userRooms.get(socket.id);
         if (currentRoomID) {
             socket.leave(currentRoomID);
-            userRooms.delete(socket.id);
+            this.userRooms.delete(socket.id);
         }
 
         socket.join(roomID);
-        userRooms.set(socket.id, roomID);
+        this.userRooms.set(socket.id, roomID);
 
-        const room = rooms.get(roomID);
+        const room = this.rooms.get(roomID);
         if (!room) {
-            rooms.set(roomID, newRoom());
+            this.rooms.set(roomID, newRoom());
         } else {
             socket.emit('state-patches', room.patches);
         }
-    })
+    }
 
-    socket.on('state-patches', patches => {
-        // console.log(patches);
-
-        const roomID = userRooms.get(socket.id);
+    onStatePatches = (socket: Socket) => (patches: Patch[]) => {
+        const roomID = this.userRooms.get(socket.id);
         if (roomID) {
             socket.to(roomID).emit('state-patches', patches);
 
-            const room = rooms.get(roomID);
+            const room = this.rooms.get(roomID);
             if (room) {
                 room.patches.push(...patches);
 
@@ -82,10 +90,11 @@ io.on('connect', socket => {
                 console.log(room.patches);
             }
         }
-    }) 
+    }
 
-    // ping helper
-    socket.on("ping", (callback) => {
+    onPing = (_socket: Socket) => (callback: () => void) => {
         callback();
-    });
-})
+    }
+}
+
+new Server();

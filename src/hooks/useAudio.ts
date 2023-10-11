@@ -7,7 +7,7 @@ type Options = {
 export function useAudio(
     url: string,
     {
-        volume = 1.0
+        volume = 1.0,
     }: Options = {}
 ) {
     const audio = useMemo(() => {
