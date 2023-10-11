@@ -45,8 +45,6 @@ class Server {
     }
 
     onMessage = (socket: Socket) => (message: string, username: string) => {
-        console.log(`${username}: ${message}`);
-
         const user: User = {
             name: username,
             id: socket.id,
@@ -55,11 +53,11 @@ class Server {
         socket.rooms.forEach((room) => {
             socket.to(room).emit('message', message, user);
         })
+
+        console.log(`${username}: ${message}`);
     }
 
     onJoinRoom = (socket: Socket) => (roomID: string, username: string) => {
-        console.log(`${username} joined room ${roomID}`);
-
         const currentRoomID = this.userRooms.get(socket.id);
         if (currentRoomID) {
             socket.leave(currentRoomID);
@@ -75,6 +73,8 @@ class Server {
         } else {
             socket.emit('state-patches', room.patches);
         }
+
+        console.log(`${username} joined room ${roomID}`);
     }
 
     onStatePatches = (socket: Socket) => (patches: Patch[]) => {
