@@ -4,27 +4,62 @@ import { Socket, Server as SocketIOServer } from "socket.io";
 
 enablePatches();
 
-type Room = {
-    patches: Patch[],
- }
-
- function newRoom() {
-    return {
-        patches: [],
-    }
- }
-
- function compressPatches(state: State, patches: Patch[]) {
+function compressPatches(state: State, patches: Patch[]) {
     const [_newState, newPatches, _inversePatches] = produceWithPatches(state, draft => {
         applyPatches(draft, patches);
     });
 
     return newPatches;
- }
+}
+
+class Room {
+    id: RoomID;
+    patches: Patch[] = [];
+    users: Map<UserID, User> = new Map();
+
+    constructor(id: RoomID) {
+        this.id = id;
+    }
+
+    join(socket: Socket, username: string) {
+        const user = {
+            id: socket.id,
+            name: username,
+        }
+
+        socket.emit('state-patches', this.patches);
+
+        socket.join(this.id);
+        this.users.set(user.id, user);
+
+        socket.on('message', this.onMessage(socket, user));
+        socket.on('state-patches', this.onStatePatches(socket));
+
+        socket.on('disconnect', () => {
+            this.users.delete(user.id);
+        })
+
+        console.log(`${username} joined room ${this.id}`);
+    }
+
+    onMessage = (socket: Socket, user: User) => (message: string, _: string) => {
+        socket.to(this.id).emit('message', message, user.name);
+
+        console.log(`${user.name}: ${message}`);
+    }
+
+    onStatePatches = (socket: Socket) => (patches: Patch[]) => {
+        socket.to(this.id).emit('state-patches', patches);
+
+        this.patches.push(...patches);
+        this.patches = compressPatches(initialState, this.patches);
+
+        console.log(this.patches);
+    }
+}
 
 class Server {
     io: SocketIOServer;
-    userRooms = new Map<UserID, RoomID>();
     rooms = new Map<RoomID, Room>();
 
     constructor() {
@@ -35,61 +70,26 @@ class Server {
         });
 
         this.io.on('connect', socket => {
-            socket.on('message', this.onMessage(socket));
             socket.on('join-room', this.onJoinRoom(socket));
-            socket.on('state-patches', this.onStatePatches(socket));
-            socket.on("ping", this.onPing(socket));
+            socket.on('ping', this.onPing(socket));
         })
 
         console.log("server started");
     }
 
-    onMessage = (socket: Socket) => (message: string, username: string) => {
-        const user: User = {
-            name: username,
-            id: socket.id,
+    getRoom(roomID: RoomID): Room {
+        if (!this.rooms.has(roomID)) {
+            const room = new Room(roomID);
+            this.rooms.set(roomID, room);
+
+            return room;
         }
 
-        socket.rooms.forEach((room) => {
-            socket.to(room).emit('message', message, user);
-        })
-
-        console.log(`${username}: ${message}`);
+        return this.rooms.get(roomID)!;
     }
 
-    onJoinRoom = (socket: Socket) => (roomID: string, username: string) => {
-        const currentRoomID = this.userRooms.get(socket.id);
-        if (currentRoomID) {
-            socket.leave(currentRoomID);
-            this.userRooms.delete(socket.id);
-        }
-
-        socket.join(roomID);
-        this.userRooms.set(socket.id, roomID);
-
-        const room = this.rooms.get(roomID);
-        if (!room) {
-            this.rooms.set(roomID, newRoom());
-        } else {
-            socket.emit('state-patches', room.patches);
-        }
-
-        console.log(`${username} joined room ${roomID}`);
-    }
-
-    onStatePatches = (socket: Socket) => (patches: Patch[]) => {
-        const roomID = this.userRooms.get(socket.id);
-        if (roomID) {
-            socket.to(roomID).emit('state-patches', patches);
-
-            const room = this.rooms.get(roomID);
-            if (room) {
-                room.patches.push(...patches);
-
-                room.patches = compressPatches(initialState, room.patches);
-                console.log(room.patches);
-            }
-        }
+    onJoinRoom = (socket: Socket) => (roomID: RoomID, username: string) => {
+        this.getRoom(roomID).join(socket, username);
     }
 
     onPing = (_socket: Socket) => (callback: () => void) => {
