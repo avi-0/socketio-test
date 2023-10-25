@@ -1,17 +1,20 @@
-import { useState } from "react";
 import { Socket } from "socket.io-client";
-import MessageList, { Message, User } from "./MessageList";
+import MessageList, { User } from "./MessageList";
 import InputLine from "./InputLine";
 import { useSearchParams } from "react-router-dom";
 import { useOnSocketEvent } from "../hooks/useOnSocketEvent";
+import { post } from "../features/chat/chatSlice";
+import { selectChatMessages, useAppDispatch, useAppSelector } from "../store";
 
 interface Props {
     socket: Socket;
 }
 
 export function Chat({ socket }: Props) {
-    const [messages, setMessages] = useState<Message[]>([]);
     const [searchParams, _] = useSearchParams();
+
+    const messages = useAppSelector(selectChatMessages);
+    const dispatch = useAppDispatch();
 
     const user: User = {
         name: searchParams.get("name") || "anonymous",
@@ -23,7 +26,8 @@ export function Chat({ socket }: Props) {
             text: text,
             user: user,
         };
-        setMessages((messages) => [...messages, message]);
+        
+        dispatch(post(message));
     }
 
     useOnSocketEvent(socket, 'connect', () => {
