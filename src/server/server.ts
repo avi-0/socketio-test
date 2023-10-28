@@ -1,6 +1,7 @@
 import { RoomID, State, User, UserID, initialState } from "../common/types";
 import { Patch, applyPatches, enablePatches, produceWithPatches } from "immer";
 import { Socket, Server as SocketIOServer } from "socket.io";
+import { AppStore, createAppStore } from "../store";
 
 enablePatches();
 
@@ -16,9 +17,15 @@ class Room {
     id: RoomID;
     patches: Patch[] = [];
     users: Map<UserID, User> = new Map();
+    store: AppStore;
+    interval: NodeJS.Timeout | undefined;
 
     constructor(id: RoomID) {
         this.id = id;
+
+        this.store = createAppStore();
+
+        this.createInterval();
     }
 
     join(socket: Socket, username: string) {
@@ -34,6 +41,7 @@ class Room {
 
         socket.on('message', this.onMessage(socket, user));
         socket.on('state-patches', this.onStatePatches(socket));
+        socket.on('client-action', this.onClientAction);
 
         socket.on('disconnect', () => {
             this.users.delete(user.id);
@@ -55,6 +63,20 @@ class Room {
         this.patches = compressPatches(initialState, this.patches);
 
         console.log(this.patches);
+    }
+
+    onClientAction = (action: any) => {
+        console.log(action);
+    }
+
+    createInterval() {
+        if (this.interval) {
+            clearInterval(this.interval);
+        }
+
+        this.interval = setInterval(() => {
+
+        }, 1000)
     }
 }
 

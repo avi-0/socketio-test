@@ -4,13 +4,16 @@ import { TypedUseSelectorHook, useDispatch, useSelector, useStore } from "react-
 
 const listenerMiddleware = createListenerMiddleware();
 
-const store = configureStore({
+// helper for creating stores on backend
+export const createAppStore = () => configureStore({
     reducer: {
         chat: chatSlice,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware().prepend(listenerMiddleware.middleware),
 })
+
+const store = createAppStore();
 
 export default store;
 

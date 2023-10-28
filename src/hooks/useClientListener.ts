@@ -12,6 +12,8 @@ export function useClientListeners(socket: Socket) {
             },
             effect: (action, _api) => {
                 console.log(action);
+
+                socket.emit('client-action', action);
             }
         });
 
