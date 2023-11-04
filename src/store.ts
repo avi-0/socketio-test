@@ -1,14 +1,34 @@
-import { TypedAddListener, addListener, configureStore, createListenerMiddleware } from "@reduxjs/toolkit";
+import { Action, TypedAddListener, addListener, combineReducers, configureStore, createAction, createListenerMiddleware } from "@reduxjs/toolkit";
 import chatSlice, { selectMessages } from "./features/chat/chatSlice";
 import { TypedUseSelectorHook, useDispatch, useSelector, useStore } from "react-redux";
 
 const listenerMiddleware = createListenerMiddleware();
 
+// make main reducer from slices
+
+const mainReducer = combineReducers({
+    chat: chatSlice,
+})
+
+export type RootState = ReturnType<typeof mainReducer>;
+
+// rootReducer adds setRootState action to it
+
+const setRootState = createAction<RootState>("root/set");
+
+const rootReducer = (state: RootState | undefined, action: Action) => {
+    if (setRootState.match(action)) {
+        state = action.payload;
+    }
+
+    return mainReducer(state, action);
+}
+
+
+
 // helper for creating stores on backend
 export const createAppStore = () => configureStore({
-    reducer: {
-        chat: chatSlice,
-    },
+    reducer: rootReducer,
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware().prepend(listenerMiddleware.middleware),
 })
@@ -16,8 +36,6 @@ export const createAppStore = () => configureStore({
 const store = createAppStore();
 
 export default store;
-
-export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
 export type AppStore = typeof store;
 
